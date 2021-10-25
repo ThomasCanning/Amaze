@@ -5,16 +5,15 @@ import java.util.Scanner;
 public class MazeFiles {
 
     int[][] mazeMatrix = new int[ControlPanel.mazeDimensions][ControlPanel.mazeDimensions];
+    static int numOfMazes=0;
 
-    MazeFiles() throws FileNotFoundException {
+    MazeFiles(int mazeNumber) throws FileNotFoundException {
 
-
-        boolean fileExists=true;
-        int i=1;
         //for(int i=1;fileExists;i++){
-            File checkFile = new File("src/main/resources/Maze" + i +  ".txt");
+            File checkFile = new File("src/main/resources/Maze" + mazeNumber +  ".txt");
             if (checkFile.isFile()) {
                 //File exists:
+                MazeFiles.numOfMazes++;
                 Scanner reader = new Scanner(checkFile);
                 int y = 0;
                 while (reader.hasNextLine()) {
@@ -25,11 +24,8 @@ public class MazeFiles {
                     y++;
                 }
                 reader.close();
-
-            } else {
-                fileExists=false;
             }
         //}
     }
+    }
 
-}

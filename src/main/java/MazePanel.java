@@ -34,9 +34,14 @@ public class MazePanel extends JPanel {
         this.addMouseListener(clickListener);
 
         //Creates a Maze array from a text file
-        MazeFiles mazeFiles = new MazeFiles();
+        MazeFiles mazeFiles = new MazeFiles(1);
         mazeMatrix = mazeFiles.mazeMatrix;
 
+    }
+
+    public static void loadMaze(int mazeLoad) throws FileNotFoundException {
+        MazeFiles mazeFiles = new MazeFiles(mazeLoad);
+        mazeMatrix = mazeFiles.mazeMatrix;
     }
 
     public void paint(Graphics g) {

@@ -5,13 +5,14 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import net.miginfocom.swing.MigLayout;
 
 
 public class ControlPanel extends JPanel {
 
-    MazePanel maze = GamePanel.mazePanel;
+    public MazePanel maze = GamePanel.mazePanel;
 
     //GUI objects -----
     JComboBox mazeList;
@@ -22,10 +23,12 @@ public class ControlPanel extends JPanel {
     JButton mazeSizeDown;
     JButton mazeSizeBigDown;
     JButton saveButton;
+    JButton resetSolveButton;
     JButton resetButton;
     JButton wallPieceButton;
     JButton startPieceButton;
     JButton endPieceButton;
+    JButton clearMazeButton;
 
     JComboBox algorithmSelection;
     JButton solveButton;
@@ -35,15 +38,16 @@ public class ControlPanel extends JPanel {
     Insets smallInset;
     //-----
 
-    String[] mazes = {"Maze 1"}; //temporary
-    String[] algorithms = {"A* Algorithm"};
+    ArrayList<String> mazes = new ArrayList<String>();
+    String[] algorithms = {"A* Search", "Depth First Search"};
 
     final int MAX_MAZE_DIMENSION = 25;
     static int mazeDimensions = 25;
     static int currentPiece=1;
+    static int currentMaze = 1;
 
     public ControlPanel() throws FileNotFoundException {
-
+        mazes.add("Maze 1");
         silverColor = new Color(192, 192, 192);
         smallInset = new Insets(0, 0, 0, 0);
 
@@ -53,12 +57,12 @@ public class ControlPanel extends JPanel {
         this.setPreferredSize(new Dimension(220, 100));
         this.setLayout(new MigLayout("fillx",
                 "[80][80]",
-                "[200][50][60][50][60][70][70][70][100][70][80]"));
+                "[200][0][60][50][60][70][70][70][100][70][80]"));
 
         //Creates components
-        mazeList = new JComboBox(mazes);
+        mazeList = new JComboBox(mazes.toArray());
         mazeList.setBackground(silverColor);
-        newMazeButton = new JButton("New");
+        newMazeButton = new JButton("New Maze");
         newMazeButton.setBackground((silverColor));
         mazeSizeDisplay = new JLabel(mazeDimensions + "*" + mazeDimensions);
         mazeSizeDisplay.setFont(new Font("Arial", Font.BOLD, 30));
@@ -78,8 +82,12 @@ public class ControlPanel extends JPanel {
         mazeSizeBigDown.setBackground(silverColor);
         saveButton = new JButton("Save");
         saveButton.setBackground(silverColor);
+        clearMazeButton = new JButton("Clear");
+        clearMazeButton.setBackground(silverColor);
         resetButton = new JButton("Reset");
         resetButton.setBackground(silverColor);
+        resetSolveButton = new JButton("Reset Solve");
+        resetSolveButton.setBackground(silverColor);
         wallPieceButton = new JButton("Wall");
         wallPieceButton.setBackground(Color.BLACK);
         startPieceButton = new JButton("Start");
@@ -94,27 +102,39 @@ public class ControlPanel extends JPanel {
 
         //Adds components to control panel
         this.add(mazeList, "w 150!, h 50!, cell 0 0, span 2, align center, wrap");
-        this.add(mazeSizeUp, "w 40!, h 30!, cell 0 1");
-        this.add(mazeSizeBigUp, "w 40!, h 30!, cell 0 1, wrap");
-        this.add(mazeSizeDisplay, "cell 0 2, align c");
-        this.add(newMazeButton, "w 80!, h 40!, cell 1 2, wrap");
-        this.add(mazeSizeDown, "w 40!, h 30!, cell 0 3");
-        this.add(mazeSizeBigDown, "w 40!, h 30!, cell 0 3, wrap");
-        this.add(saveButton, "w 80!, h 40!, cell 0 4");
-        this.add(resetButton, "w 80!, h 40!, cell 1 4");
+        //this.add(mazeSizeUp, "w 40!, h 30!, cell 0 1");
+        //this.add(mazeSizeBigUp, "w 40!, h 30!, cell 0 1, wrap");
+        //this.add(mazeSizeDisplay, "cell 0 2, align c");
+        this.add(newMazeButton, "w 100!, h 40!, cell 0 1, align center, wrap");
+        this.add(clearMazeButton, "w 100!, h 40!, cell 1 1, align center, wrap");
+        //this.add(mazeSizeDown, "w 40!, h 30!, cell 0 3");
+        //this.add(mazeSizeBigDown, "w 40!, h 30!, cell 0 3, wrap");
+        this.add(saveButton, "w 80!, h 40!, cell 0 4, align c");
+        this.add(resetButton, "w 80!, h 40!, cell 1 4, align c");
         this.add(wallPieceButton, "w 80!, h 40!, cell 0 5, span 2, align c");
         this.add(startPieceButton, "w 80!, h 40!, cell 0 6, span 2, align c");
         this.add(endPieceButton, "w 80!, h 40!, cell 0 7, span 2, align c");
         this.add(algorithmSelection, "w 150!, h 50!, cell 0 8, span 2, align center, wrap");
         this.add(solveButton, "w 120!, h 40!, cell 0 9, span 2, align c");
-        this.add(timeDisplay, "cell 0 10, span 2, align c");
+        this.add(resetSolveButton, "w 120!, h 40!, cell 0 10, span 2, align c");
+        this.add(timeDisplay, "cell 0 11, span 2, align c");
 
         //What happens when the selected maze is changed
         mazeList.addItemListener(e -> {
-
+            System.out.println(mazeList.getSelectedItem());
         });
 
-        //Setting dimensions of new Maze: -----
+        clearMazeButton.addActionListener(e -> {
+            for(int row = 0; row < MazePanel.mazeMatrix.length;row++){
+                for(int col = 0;col<MazePanel.mazeMatrix[row].length;col++){
+                    MazePanel.mazeMatrix[row][col]=0;
+                }
+            }
+            maze.repaint();
+            System.out.println("clear");
+        });
+
+        //Setting dimensions of new Maze: ----- Feature Not used at present for simplicity
         //Maze size up
         mazeSizeUp.addActionListener(e -> {
             if (mazeDimensions < MAX_MAZE_DIMENSION) mazeDimensions++;
@@ -139,16 +159,23 @@ public class ControlPanel extends JPanel {
         });
         //New maze button pressed
         newMazeButton.addActionListener(e -> {
-            //Save Current Maze
+            MazeFiles.numOfMazes++;
             //Create new maze and set to new maze
             MazePanel.newMaze(Integer.parseInt(mazeSizeDisplay.getText().substring(0,mazeSizeDisplay.getText().indexOf('*'))));
+            mazes.add("Maze "+MazeFiles.numOfMazes);
+            mazeList.addItem(mazes.get(MazeFiles.numOfMazes-1));
+            try {
+                MazePanel.loadMaze(MazeFiles.numOfMazes);
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            }
         });
         //-----
 
         saveButton.addActionListener(e -> {
             //Save Current Maze:
             try {
-                FileWriter writer = new FileWriter("res/Maze1.txt");
+                FileWriter writer = new FileWriter("src/main/resources/Maze1.txt");
                 for (int y = 0; y < ControlPanel.mazeDimensions; y++) {
                     for (int x = 0; x < ControlPanel.mazeDimensions; x++) {
                         if(MazePanel.mazeMatrix[x][y]<=3) writer.write(String.valueOf(MazePanel.mazeMatrix[x][y]));
@@ -169,13 +196,23 @@ public class ControlPanel extends JPanel {
             //Resets the maze in the maze panel
             MazeFiles mazeFiles = null;
             try {
-                mazeFiles = new MazeFiles();
+                mazeFiles = new MazeFiles(currentMaze);
             } catch (FileNotFoundException fileNotFoundException) {
                 fileNotFoundException.printStackTrace();
             }
             MazePanel.mazeMatrix= mazeFiles.mazeMatrix;
             maze.repaint();
 
+        });
+
+        resetSolveButton.addActionListener(e -> {
+            for(int row = 0; row < MazePanel.mazeMatrix.length;row++){
+                for(int col = 0;col<MazePanel.mazeMatrix[row].length;col++){
+                    if(MazePanel.mazeMatrix[row][col]==4||MazePanel.mazeMatrix[row][col]==5) MazePanel.mazeMatrix[row][col]=0;
+                }
+            }
+            maze.repaint();
+            System.out.println("reset");
         });
 
         wallPieceButton.addActionListener(e -> {
@@ -195,9 +232,24 @@ public class ControlPanel extends JPanel {
         //Solving controls
         solveButton.addActionListener(e -> {
             Start();
-            AStarAlgorithm solveSmart = new AStarAlgorithm();
+            //AStarAlgorithm solveSmart = new AStarAlgorithm();
             //depthFirstAlgorithm solveDepth = new depthFirstAlgorithm();
             //Code that runs an algorithm that solves maze
+
+            String algorithm = String.valueOf(algorithmSelection.getSelectedItem());
+            System.out.println(algorithm);
+
+            switch(algorithm) {
+                case "A* Search":
+                    AStarAlgorithm aStarSearch = new AStarAlgorithm();
+                    break;
+
+                case "Depth First Search":
+                    depthFirstAlgorithm depthSearch = new depthFirstAlgorithm();
+                    break;
+            }
+
+
 
             End();
             timeDisplay.setText(solveTime+" ns");
@@ -213,6 +265,4 @@ public class ControlPanel extends JPanel {
         }
         void End() {solveTime = System.nanoTime()-startTime;
         }
-
-
 }

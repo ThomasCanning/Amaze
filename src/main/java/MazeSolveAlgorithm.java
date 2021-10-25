@@ -1,147 +1,140 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-public class MazeSolveAlgorithm {
+/* The Following are 4 classes at present, for search algorithms and corresponding classes for nodes for the search algorithms. When the programme
+ran, an algorithm can be selected and ran to compare the 2*/
+
+
+class AStarAlgorithm {
     int[][] mazeMatrix = MazePanel.mazeMatrix;
     MazePanel mazePanel = GamePanel.mazePanel;
-    Node startNode;
-    Node endNode;
-    public MazeSolveAlgorithm(){
+    AStarNode startAStarNode;
+    AStarNode endAStarNode;
+    public AStarAlgorithm() {
         //Gets x and y positions of start and end nodes in matrix
         for (int y = 0; y < mazeMatrix.length; y++) {
             for (int x = 0; x < mazeMatrix.length; x++) {
-                if (mazeMatrix[x][y] == 2) startNode = new Node(x, y);
-                if (mazeMatrix[x][y] == 3) endNode = new Node(x, y);
+                if (mazeMatrix[x][y] == 2) startAStarNode = new AStarNode(x, y);
+                if (mazeMatrix[x][y] == 3) endAStarNode = new AStarNode(x, y);
             }
         }
-    }
-}
 
-class AStarAlgorithm extends MazeSolveAlgorithm{
-    public AStarAlgorithm() {
-        MazeSolveAlgorithm maze = new MazeSolveAlgorithm();
-        List<Node> openNodes =new ArrayList<>();
-        openNodes.add(startNode);
-        List<Node> closedNodes =new ArrayList<>();
-        Node currentNode;
-        Node previousNode = null;
-        while(openNodes.size()>0){
-            currentNode=openNodes.get(0);
+        List<AStarNode> openAStarNodes =new ArrayList<>();
+        openAStarNodes.add(startAStarNode);
+        List<AStarNode> closedAStarNodes =new ArrayList<>();
+        AStarNode currentAStarNode;
+        AStarNode previousAStarNode = null;
+        while(openAStarNodes.size()>0){
+            currentAStarNode=openAStarNodes.get(0);
 
             //Searches through open points for one with lowest f cost
-            for(int i=1;i<openNodes.size();i++){
+            for(int i=1;i<openAStarNodes.size();i++){
                 //updates current node if better than currently selected node from open nodes
-                if((openNodes.get(i).fCost())<currentNode.fCost()||(openNodes.get(i).fCost()==currentNode.fCost()&&openNodes.get(i).hCost<currentNode.hCost)){
-                    currentNode=openNodes.get(i);
+                if((openAStarNodes.get(i).fCost())<currentAStarNode.fCost()||(openAStarNodes.get(i).fCost()==currentAStarNode.fCost()&&openAStarNodes.get(i).hCost<currentAStarNode.hCost)){
+                    currentAStarNode=openAStarNodes.get(i);
                 }
             }
-            openNodes.remove(currentNode);
-            closedNodes.add(currentNode);
+            openAStarNodes.remove(currentAStarNode);
+            closedAStarNodes.add(currentAStarNode);
 
             //checks if reached end node
-            if(currentNode.x==endNode.x&&currentNode.y==endNode.y){
+            if(currentAStarNode.x==endAStarNode.x&&currentAStarNode.y==endAStarNode.y){
                 //What happens when reached end point
-                endNode.parent=previousNode;
-                List<Node> path = retracePath(startNode, previousNode);
-                for (int i=0;i<path.size();i++) {
-                    MazePanel.mazeMatrix[path.get(i).x][path.get(i).y]=5;
+                endAStarNode.parent=previousAStarNode;
+                List<AStarNode> path = retracePath(startAStarNode, previousAStarNode);
+                for (AStarNode aStarNode : path) {
+                    MazePanel.mazeMatrix[aStarNode.x][aStarNode.y] = 5;
                 }
-                maze.mazePanel.repaint();
+                mazePanel.repaint();
                 return;
             }
             //checks each neighbour of current node that isn't a wall
-            for (Node neighbour:getNeighbours(currentNode.x, currentNode.y, closedNodes)){
+            for (AStarNode neighbour:getNeighbours(currentAStarNode.x, currentAStarNode.y, closedAStarNodes)){
                 //If neighbour already visited
-                if(neighbourInList(closedNodes, neighbour)){
+                if(neighbourInList(closedAStarNodes, neighbour)){
                     continue;
                 }
-                int newCostToNeighbour = currentNode.gCost+getDistance(currentNode, neighbour);
-                if(newCostToNeighbour<neighbour.gCost||!openNodes.contains(neighbour)){
+                int newCostToNeighbour = currentAStarNode.gCost+getDistance(currentAStarNode, neighbour);
+                if(newCostToNeighbour<neighbour.gCost||!openAStarNodes.contains(neighbour)){
                     //updates values of neighbour
                     neighbour.gCost=newCostToNeighbour;
-                    neighbour.hCost=getDistance(neighbour, endNode);
-                    neighbour.parent=currentNode;
-                    /*if(MazePanel.mazeMatrix[neighbour.x][neighbour.y]!=3) MazePanel.mazeMatrix[neighbour.x][neighbour.y]=4;
-                    maze.mazePanel.repaint();*/
+                    neighbour.hCost=getDistance(neighbour, endAStarNode);
+                    neighbour.parent=currentAStarNode;
                     //adds neighbour to open set
-                    if(!neighbourInList(openNodes, neighbour))openNodes.add(neighbour);
+                    if(!neighbourInList(openAStarNodes, neighbour))openAStarNodes.add(neighbour);
                 }
             }
-            previousNode = currentNode;
+            previousAStarNode = currentAStarNode;
         }
 
     }
 
-    public List retracePath(Node startNode, Node endNode){
-        List<Node> path = new ArrayList<>();
-        Node currentNode = endNode;
-        while (currentNode!=startNode){
-            path.add(currentNode);
-            MazePanel.mazeMatrix[currentNode.x][currentNode.y]=3;
-            currentNode=currentNode.parent;
+    public List retracePath(AStarNode startAStarNode, AStarNode endAStarNode){
+        List<AStarNode> path = new ArrayList<>();
+        AStarNode currentAStarNode = endAStarNode;
+        while (currentAStarNode!=startAStarNode){
+            path.add(currentAStarNode);
+            MazePanel.mazeMatrix[currentAStarNode.x][currentAStarNode.y]=3;
+            currentAStarNode=currentAStarNode.parent;
         }
         Collections.reverse(path);
         return path;
     }
 
-    public boolean neighbourInList(List<Node> nodeList, Node neighbour){
+    public boolean neighbourInList(List<AStarNode> nodeList, AStarNode neighbour){
         boolean equals = false;
-        if(nodeList.size()==0)equals = false;
-        else{
-            for(int i=0;i<nodeList.size();i++){
-                if(nodeList.get(i).x==neighbour.x&&nodeList.get(i).y==neighbour.y){
-                    equals = true;
-                }
+        for (AStarNode aStarNode : nodeList) {
+            if (aStarNode.x == neighbour.x && aStarNode.y == neighbour.y) {
+                equals = true;
+                break;
             }
         }
         return equals;
     }
 
     //returns distance between 2 nodes
-    private int getDistance(Node nodeA, Node nodeB) {
+    private int getDistance(AStarNode nodeA, AStarNode nodeB) {
         return (int)(Math.sqrt(Math.pow(nodeA.x-nodeB.x,2)+Math.pow(nodeA.y-nodeB.y,2))*10);
     }
 
     //Checks neighbours of a given node
-    private List<Node> getNeighbours(int x, int y, List<Node> closedNodes){
-        List<Node> neighbours = new ArrayList<>();
+    private List<AStarNode> getNeighbours(int x, int y, List<AStarNode> closedAStarNodes){
+        List<AStarNode> neighbours = new ArrayList<>();
         boolean atTop = (y<=0);
         boolean atRight = (x>= mazeMatrix.length-1);
         boolean atBottom = (y>= mazeMatrix.length-1);
         boolean atLeft = (x<=0);
         if(!atTop) {
-            if (mazeMatrix[x][y - 1] != 1 && !closedNodes.contains(new Node(x, y - 1))) {
-                neighbours.add(new Node(x, y - 1));
+            if (mazeMatrix[x][y - 1] != 1 && !closedAStarNodes.contains(new AStarNode(x, y - 1))) {
+                neighbours.add(new AStarNode(x, y - 1));
             }
         }
         if(!atRight) {
-            if (mazeMatrix[x + 1][y] != 1 && !closedNodes.contains(new Node(x + 1, y))) {
-                neighbours.add(new Node(x + 1, y));
+            if (mazeMatrix[x + 1][y] != 1 && !closedAStarNodes.contains(new AStarNode(x + 1, y))) {
+                neighbours.add(new AStarNode(x + 1, y));
             }
         }
         if(!atBottom) {
-            if (mazeMatrix[x][y + 1] != 1 && !closedNodes.contains(new Node(x, y + 1))) {
-                neighbours.add(new Node(x, y + 1));
+            if (mazeMatrix[x][y + 1] != 1 && !closedAStarNodes.contains(new AStarNode(x, y + 1))) {
+                neighbours.add(new AStarNode(x, y + 1));
             }
         }
         if(!atLeft) {
-            if (mazeMatrix[x - 1][y] != 1 && !closedNodes.contains(new Node(x - 1, y))) {
-                neighbours.add(new Node(x - 1, y));
+            if (mazeMatrix[x - 1][y] != 1 && !closedAStarNodes.contains(new AStarNode(x - 1, y))) {
+                neighbours.add(new AStarNode(x - 1, y));
             }
         }
         return neighbours;
     }
 }
 
-class Node{
+class AStarNode{
     int x;
     int y;
     int gCost;
     int hCost;
-    Node parent;
+    AStarNode parent;
 
-public Node(int x, int y){
+public AStarNode(int x, int y){
     this.x=x;
     this.y=y;
 }
@@ -151,7 +144,121 @@ public Node(int x, int y){
     }
 }
 
-    class depthFirstAlgorithm{
+class DepthNode{
+    int x;
+    int y;
+    DepthNode parent;
 
+    public DepthNode(int x, int y){
+        this.x=x;
+        this.y=y;
     }
 
+}
+
+class depthFirstAlgorithm{
+    int[][] mazeMatrix = MazePanel.mazeMatrix; //Matrix of walls, paths, start and end nodes
+    MazePanel mazePanel = GamePanel.mazePanel;
+    DepthNode startDepthNode;
+    DepthNode endDepthNode;
+    List<DepthNode> closedDepthNodes;
+    Stack<DepthNode> pathStack;
+
+    public depthFirstAlgorithm() {
+        //Gets x and y positions of start and end nodes in matrix
+        for (int y = 0; y < mazeMatrix.length; y++) {
+            for (int x = 0; x < mazeMatrix.length; x++) {
+                if (mazeMatrix[x][y] == 2) startDepthNode = new DepthNode(x, y);
+                if (mazeMatrix[x][y] == 3) endDepthNode = new DepthNode(x, y);
+            }
+        }
+
+        closedDepthNodes = new ArrayList<>();
+        DepthNode currentDepthNode = startDepthNode;
+        pathStack = new Stack();
+        pathStack.push(currentDepthNode);
+
+        searchDeep(currentDepthNode, closedDepthNodes, null);
+    }
+
+    public void searchDeep(DepthNode currentDepthNode, List<DepthNode> closedDepthNodes, DepthNode previousDepthNode) {
+        if (currentDepthNode.x == endDepthNode.x && currentDepthNode.y == endDepthNode.y) {
+            //What happens when reached end point
+            endDepthNode.parent = previousDepthNode;
+            List<DepthNode> path = retracePath(startDepthNode, previousDepthNode);
+            for (DepthNode depthNode : path) {
+                MazePanel.mazeMatrix[depthNode.x][depthNode.y] = 5;
+            }
+            mazeMatrix[endDepthNode.x][endDepthNode.y]=3;
+            mazeMatrix[startDepthNode.x][startDepthNode.y]=2;
+            mazePanel.repaint();
+
+        } else {
+            previousDepthNode = currentDepthNode;
+            currentDepthNode = getNeighbour(currentDepthNode, closedDepthNodes);
+            //MazePanel.mazeMatrix[currentDepthNode.x][currentDepthNode.y]=4;
+            mazePanel.repaint();
+            pathStack.push(previousDepthNode);
+            pathStack.push(currentDepthNode);
+            if(neighbourInList(closedDepthNodes, currentDepthNode.x, currentDepthNode.y)) closedDepthNodes.add(currentDepthNode);
+            currentDepthNode.parent=previousDepthNode;
+
+            searchDeep(currentDepthNode, closedDepthNodes, currentDepthNode.parent); //Recursively call search algorithm
+        }
+    }
+
+    public List retracePath(DepthNode startDepthNode, DepthNode endDepthNode){
+        List<DepthNode> path = new ArrayList<>();
+        DepthNode currentDepthNode = endDepthNode;
+        while (currentDepthNode!=startDepthNode){
+            path.add(currentDepthNode);
+            MazePanel.mazeMatrix[currentDepthNode.x][currentDepthNode.y]=3;
+            currentDepthNode=currentDepthNode.parent;
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+    public boolean neighbourInList(List<DepthNode> nodeList, int x, int y){
+        boolean equals = false;
+            for (DepthNode depthNode : nodeList) {
+                if (depthNode.x == x && depthNode.y == y) {
+                    equals = true;
+                    break;
+                }
+            }
+        return !equals;
+    }
+
+    private DepthNode getNeighbour(DepthNode currentNode, List<DepthNode> closedDepthNodes){
+        int x = currentNode.x;
+        int y = currentNode.y;
+        boolean atTop = (y<=0);
+        boolean atRight = (x>= mazeMatrix.length-1);
+        boolean atBottom = (y>= mazeMatrix.length-1);
+        boolean atLeft = (x<=0);
+        if(!atTop) {
+            if (mazeMatrix[x][y - 1] != 1 && neighbourInList(closedDepthNodes, x, y - 1)) {
+                return (new DepthNode(x, y - 1));
+            }
+        }
+        if(!atRight) {
+            if (mazeMatrix[x + 1][y] != 1 && neighbourInList(closedDepthNodes, x + 1, y)) {
+                return (new DepthNode(x + 1, y));
+            }
+        }
+        if(!atBottom) {
+            if (mazeMatrix[x][y + 1] != 1 && neighbourInList(closedDepthNodes, x, y + 1)) {
+                return (new DepthNode(x, y + 1));
+            }
+        }
+        if(!atLeft) {
+            if (mazeMatrix[x - 1][y] != 1 && neighbourInList(closedDepthNodes, x - 1, y)) {
+                return (new DepthNode(x - 1, y));
+            }
+        }
+
+        return getNeighbour(pathStack.pop(), closedDepthNodes);
+    }
+
+}
