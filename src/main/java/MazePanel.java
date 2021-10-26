@@ -86,7 +86,8 @@ public class MazePanel extends JPanel {
             }
         }
         private class ClickListener extends MouseAdapter {
-          public void mousePressed(MouseEvent e) {
+
+            public void mousePressed(MouseEvent e) {
                 int xIndex = 0;
                 int yIndex =0;
                  int index = 0;
