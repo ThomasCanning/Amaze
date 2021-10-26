@@ -11,6 +11,7 @@ class SearchClass{ //Parent class of search algorithms with methods for retracin
             path.add(currentNode);
             MazePanel.mazeMatrix[currentNode.x][currentNode.y]=3;
             currentNode=currentNode.parent;
+
         }
         Collections.reverse(path);
         return path;
@@ -64,7 +65,7 @@ class AStarAlgorithm extends SearchClass{
         List<Node> closedNodes =new ArrayList<>();
         Node currentNode;
         Node previousNode = null;
-        while(openNodes.size()>0){
+        while(openNodes.size()>0){ //Iteratively uses A* algorithm to find shortest path
             currentNode=openNodes.get(0);
 
             //Searches through open points for one with lowest f cost
@@ -74,7 +75,7 @@ class AStarAlgorithm extends SearchClass{
                     currentNode=openNodes.get(i);
                 }
             }
-            openNodes.remove(currentNode);
+            openNodes.remove(currentNode);//Switches current node to closed list
             closedNodes.add(currentNode);
 
             //checks if reached end node
@@ -90,18 +91,29 @@ class AStarAlgorithm extends SearchClass{
             }
             //checks each neighbour of current node that isn't a wall
             for (Node neighbour:getNeighbours(currentNode.x, currentNode.y, closedNodes)){
-                //If neighbour already visited
+                //If neighbour already visited ignore
                 if(neighbourInList(closedNodes, neighbour)){
                     continue;
                 }
-                int newCostToNeighbour = currentNode.gCost+getDistance(currentNode, neighbour);
-                if(newCostToNeighbour<neighbour.gCost||!openNodes.contains(neighbour)){
-                    //updates values of neighbour
-                    neighbour.gCost=newCostToNeighbour;
+                //Finds old route to neighbour
+                int oldCostToNeighbour = currentNode.gCost+getDistance(currentNode, neighbour);
+                //If not on open list, add it to open list and set g and h costs and assign parent
+                if(!neighbourInList(openNodes, neighbour)){
+                    openNodes.add(neighbour);
+                    neighbour.gCost=getDistance(neighbour, startNode);
+                    neighbour.hCost=getDistance(neighbour, endNode);
+                    neighbour.parent=currentNode;
+                    //Paint squares on open list to make it more visual as to what is going on
+                    if(mazeMatrix[neighbour.x][neighbour.y]==0)mazeMatrix[neighbour.x][neighbour.y]=4;
+                }
+                //If it is on open list already, check to see if new path is better
+                else if(neighbour.gCost<oldCostToNeighbour){
+
+                    //updates values of neighbour to shorter distances
+                    neighbour.gCost=getDistance(neighbour, startNode);
                     neighbour.hCost=getDistance(neighbour, endNode);
                     neighbour.parent=currentNode;
                     //adds neighbour to open set
-                    if(!neighbourInList(openNodes, neighbour))openNodes.add(neighbour);
                 }
             }
             previousNode = currentNode;
