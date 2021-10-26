@@ -25,13 +25,14 @@ public class ControlPanel extends JPanel {
 
     JComboBox algorithmSelection;
     JButton solveButton;
+    static JToggleButton toggleOpen;
     JLabel timeDisplay;
 
     Color silverColor;
     Insets smallInset;
     //-----
 
-    String[] algorithms = {"A* Search", "Depth First Search"};
+    String[] algorithms = {"A* Search", "Depth First Search", "Random Search"};
 
     static int mazeDimensions = 25;
     static int currentPiece=1;
@@ -46,7 +47,7 @@ public class ControlPanel extends JPanel {
         this.setBorder(new LineBorder(Color.black, 2, true));
         this.setPreferredSize(new Dimension(220, 100));
         this.setLayout(new MigLayout("fillx", "",
-                "[50][50][50][50][50][50][50][50][50][50][50][50][50]"));
+                "[50][50][50][50][50][50][50][50][50][50][50][50][50][50]"));
 
         //Creates components
         saveButton = new JButton("Save");
@@ -66,6 +67,8 @@ public class ControlPanel extends JPanel {
         algorithmSelection = new JComboBox(algorithms);
         solveButton = new JButton("Solve Maze");
         solveButton.setBackground(silverColor);
+        toggleOpen = new JToggleButton("Paint closed");
+        toggleOpen.setBackground(silverColor);
         timeDisplay = new JLabel("Time");
         timeDisplay.setFont(new Font("Arial", Font.BOLD, 30));
 
@@ -79,7 +82,8 @@ public class ControlPanel extends JPanel {
         this.add(algorithmSelection, "w 150!, h 50!, cell 0 9, span 2, align center, wrap");
         this.add(solveButton, "w 120!, h 40!, cell 0 10, span 2, align c");
         this.add(resetSolveButton, "w 120!, h 40!, cell 0 11, span 2, align c");
-        this.add(timeDisplay, "cell 0 12, span 2, align c");
+        this.add(toggleOpen, "w 120!, h 40!, cell 0 12, span 2, align c");
+        this.add(timeDisplay, "cell 0 13, span 2, align c");
 
         clearMazeButton.addActionListener(e -> {
             for(int row = 0; row < MazePanel.mazeMatrix.length;row++){
@@ -160,12 +164,18 @@ public class ControlPanel extends JPanel {
 
             switch(algorithm) {
                 case "A* Search":
-                    AStarAlgorithm aStarSearch = new AStarAlgorithm();
+                    new AStarAlgorithm();
                     break;
 
                 case "Depth First Search":
-                    depthFirstAlgorithm depthSearch = new depthFirstAlgorithm();
+                    new depthFirstAlgorithm(false);
                     break;
+
+                case "Random Search":
+                    System.out.println("test");
+                    new depthFirstAlgorithm(true);
+                    break;
+
             }
 
 
@@ -174,7 +184,6 @@ public class ControlPanel extends JPanel {
             timeDisplay.setText(solveTime+" ns");
         });
 
-        //----------
     }
 
         //Method and variables for calculating time solving algorithm takes

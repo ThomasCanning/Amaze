@@ -104,7 +104,7 @@ class AStarAlgorithm extends SearchClass{
                     neighbour.hCost=getDistance(neighbour, endNode);
                     neighbour.parent=currentNode;
                     //Paint squares on open list to make it more visual as to what is going on
-                    if(mazeMatrix[neighbour.x][neighbour.y]==0)mazeMatrix[neighbour.x][neighbour.y]=4;
+                    if(mazeMatrix[neighbour.x][neighbour.y]==0&&ControlPanel.toggleOpen.isSelected())mazeMatrix[neighbour.x][neighbour.y]=4;
                 }
                 //If it is on open list already, check to see if new path is better
                 else if(neighbour.gCost<oldCostToNeighbour){
@@ -157,7 +157,8 @@ class AStarAlgorithm extends SearchClass{
     }
 }
 
-class depthFirstAlgorithm extends SearchClass{
+class depthFirstAlgorithm extends SearchClass {
+    Random random = new Random();
     int[][] mazeMatrix = MazePanel.mazeMatrix; //Matrix of walls, paths, start and end nodes
     MazePanel mazePanel = GamePanel.mazePanel;
     Node startNode;
@@ -165,7 +166,7 @@ class depthFirstAlgorithm extends SearchClass{
     List<Node> closedNodes;
     Stack<Node> pathStack;
 
-    public depthFirstAlgorithm() {
+    public depthFirstAlgorithm(boolean randomEnabled) {
         //Gets x and y positions of start and end nodes in matrix
         for (int y = 0; y < mazeMatrix.length; y++) {
             for (int x = 0; x < mazeMatrix.length; x++) {
@@ -179,10 +180,10 @@ class depthFirstAlgorithm extends SearchClass{
         pathStack = new Stack();
         pathStack.push(currentNode);
 
-        searchDeep(currentNode, closedNodes, null);
+        searchDeep(currentNode, closedNodes, null, randomEnabled);
     }
 
-    private void searchDeep(Node currentNode, List<Node> closedNodes, Node previousNode) {
+    private void searchDeep(Node currentNode, List<Node> closedNodes, Node previousNode, boolean randomEnabled) {
         if (currentNode.x == endNode.x && currentNode.y == endNode.y) { //Checks if reached end node and retraces path
             //What happens when reached end point
             endNode.parent = previousNode;
@@ -190,53 +191,59 @@ class depthFirstAlgorithm extends SearchClass{
             for (Node node : path) {
                 MazePanel.mazeMatrix[node.x][node.y] = 5;
             }
-            mazeMatrix[endNode.x][endNode.y]=3;
-            mazeMatrix[startNode.x][startNode.y]=2;
+            mazeMatrix[endNode.x][endNode.y] = 3;
+            mazeMatrix[startNode.x][startNode.y] = 2;
             mazePanel.repaint();
 
-        }
-        else {
+        } else {
             previousNode = currentNode;
-            currentNode = getNeighbour(currentNode, closedNodes); //Gets a neighbour of current node excluding closed nodes
+            currentNode = getNeighbour(currentNode, closedNodes, randomEnabled); //Gets a neighbour of current node excluding closed nodes
             mazePanel.repaint();
             pathStack.push(previousNode);
             pathStack.push(currentNode);
-            if(!neighbourInList(closedNodes, currentNode)) closedNodes.add(currentNode);
-            currentNode.parent=previousNode;
+            if (!neighbourInList(closedNodes, currentNode)) closedNodes.add(currentNode);
+            currentNode.parent = previousNode;
 
-            searchDeep(currentNode, closedNodes, currentNode.parent); //Recursively call search algorithm
+            searchDeep(currentNode, closedNodes, currentNode.parent, randomEnabled); //Recursively call search algorithm
         }
     }
 
-    private Node getNeighbour(Node currentNode, List<Node> closedNodes){
+    private Node getNeighbour(Node currentNode, List<Node> closedNodes, boolean randomEnabled) {
         int x = currentNode.x;
         int y = currentNode.y;
-        boolean atTop = (y<=0);
-        boolean atRight = (x>= mazeMatrix.length-1);
-        boolean atBottom = (y>= mazeMatrix.length-1);
-        boolean atLeft = (x<=0);
-        if(!atTop) {
-            if (mazeMatrix[x][y - 1] != 1 && !neighbourInList(closedNodes, new Node(x, y-1))) {
-                return (new Node(x, y - 1));
+        boolean atTop = (y <= 0);
+        boolean atRight = (x >= mazeMatrix.length - 1);
+        boolean atBottom = (y >= mazeMatrix.length - 1);
+        boolean atLeft = (x <= 0);
+        ArrayList<Node> validNodes = new ArrayList<>();
+        if (!atTop) {
+            if (mazeMatrix[x][y - 1] != 1 && !neighbourInList(closedNodes, new Node(x, y - 1))) {
+                validNodes.add(new Node(x, y - 1));
             }
         }
-        if(!atRight) {
-            if (mazeMatrix[x + 1][y] != 1 && !neighbourInList(closedNodes,  new Node(x+1, y))) {
-                return (new Node(x + 1, y));
+        if (!atRight) {
+            if (mazeMatrix[x + 1][y] != 1 && !neighbourInList(closedNodes, new Node(x + 1, y))) {
+                validNodes.add(new Node(x + 1, y));
             }
         }
-        if(!atBottom) {
-            if (mazeMatrix[x][y + 1] != 1 && !neighbourInList(closedNodes,new Node(x, y+1))) {
-                return (new Node(x, y + 1));
+        if (!atBottom) {
+            if (mazeMatrix[x][y + 1] != 1 && !neighbourInList(closedNodes, new Node(x, y + 1))) {
+                validNodes.add(new Node(x, y + 1));
             }
         }
-        if(!atLeft) {
-            if (mazeMatrix[x - 1][y] != 1 && !neighbourInList(closedNodes, new Node(x-1, y))) {
-                return (new Node(x - 1, y));
+        if (!atLeft) {
+            if (mazeMatrix[x - 1][y] != 1 && !neighbourInList(closedNodes, new Node(x - 1, y))) {
+                validNodes.add(new Node(x - 1, y));
             }
+        }
+        if (validNodes.size() > 0 && randomEnabled) {
+            return validNodes.get(random.nextInt(validNodes.size()));
+        }
+        else if (validNodes.size()>0 && !randomEnabled) {
+            return validNodes.get(0);
         }
 
-        return getNeighbour(pathStack.pop(), closedNodes);
+        return getNeighbour(pathStack.pop(), closedNodes, randomEnabled);
+
     }
-
 }
