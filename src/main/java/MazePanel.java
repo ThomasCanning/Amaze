@@ -39,11 +39,6 @@ public class MazePanel extends JPanel {
 
     }
 
-    public static void loadMaze(int mazeLoad) throws FileNotFoundException {
-        MazeFiles mazeFiles = new MazeFiles(mazeLoad);
-        mazeMatrix = mazeFiles.mazeMatrix;
-    }
-
     public void paint(Graphics g) {
             super.paint(g);
             Graphics2D g2D = (Graphics2D) g;
@@ -145,9 +140,4 @@ public class MazePanel extends JPanel {
                 }
             }
         }
-
-    public static void newMaze(int newMazeSize){
-        //Uses maze dimensions and maze size to repaint the maze grid so a maze can be drawn
-        mazeNumberOfPieces =newMazeSize;
-    }
 }
