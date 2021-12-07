@@ -50,11 +50,11 @@
         </plugins>
     </build>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.miglayout/miglayout-swing -->
+        <!-- https://mvnrepository.com/artifact/com.miglayout/miglayout -->
         <dependency>
             <groupId>com.miglayout</groupId>
-            <artifactId>miglayout-swing</artifactId>
-            <version>11.0</version>
+            <artifactId>miglayout</artifactId>
+            <version>3.7.4</version>
         </dependency>
 
 

@@ -5,12 +5,12 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import net.miginfocom.swing.MigLayout;
 
 
 public class ControlPanel extends JPanel {
+
+    //Class that enables the GUI that lets the user control the maze software
 
     public MazePanel maze = GamePanel.mazePanel;
 
@@ -32,7 +32,7 @@ public class ControlPanel extends JPanel {
     Insets smallInset;
     //-----
 
-    String[] algorithms = {"A* Search", "Depth First Search", "Random Search"};
+    String[] algorithms = {"A* Search", "Depth First Search", "Breadth First Search","Random Search"};
 
     static int mazeDimensions = 25;
     static int currentPiece=1;
@@ -169,6 +169,10 @@ public class ControlPanel extends JPanel {
 
                 case "Depth First Search":
                     new depthFirstAlgorithm(false);
+                    break;
+
+                case "Breadth First Search":
+                    new breadthFirstAlgorithm();
                     break;
 
                 case "Random Search":

@@ -1,9 +1,10 @@
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 
 public class MazeFiles {
+
+    //Class that reads stored maze
 
     int[][] mazeMatrix = new int[ControlPanel.mazeDimensions][ControlPanel.mazeDimensions];
 
