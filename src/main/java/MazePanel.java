@@ -50,7 +50,7 @@ public class MazePanel extends JPanel {
             //Draws grid for maze
         int rowsDrawn=0;
             for(int x=((mazePanelDimensions.width/2)-(mazeSideLength/2));x<mazeSideLength-10+((mazePanelDimensions.width/2)-(mazeSideLength/2));x+=mazePieceSize){
-                for(int y=10;y<mazeSideLength-mazePieceSize;y+=mazePieceSize){
+                for(int y=10;y<mazeSideLength;y+=mazePieceSize){
                     if(rowsDrawn<mazeNumberOfPieces) g2D.drawRect(x,y,mazePieceSize,mazePieceSize);
                 }
                 rowsDrawn++;
@@ -73,7 +73,7 @@ public class MazePanel extends JPanel {
                             g2D.fillRect((((mazePanelDimensions.width/2)-(mazeSideLength/2))+x*mazePieceSize)+1, mazePieceSize*y+11, mazePieceSize-2,mazePieceSize-2);
                             break;
                         case 4:
-                            g2D.setColor(Color.yellow);
+                            g2D.setColor(new Color(245, 230, 165));
                             g2D.fillRect((((mazePanelDimensions.width/2)-(mazeSideLength/2))+x*mazePieceSize)+1, mazePieceSize*y+11, mazePieceSize-2,mazePieceSize-2);
                             break;
                         case 5:
